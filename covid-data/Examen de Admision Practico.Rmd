@@ -75,9 +75,54 @@ valida podemos interpretar que no ha habido deceso.
 SonoraFallecidos<- subset(AuxiliarDatosNacionales,ENTIDAD_RES == 26 & RESULTADO == 1 & FECHA_DEF != "9999-99-99")
 ```
 
+
 5.- Por ultimo exportamos la informacion al archivo Tabla1.CSV son la
 siguiente instruccion:
 
 ```{r }
 write.csv(SonoraFallecidos,"Tabla1.csv")
 ```
+
+
+## Problema 2
+
+
+Generar una tabla con la cantidad de casos hospitalizados en los estados de Sonora, Chihuahua, Nuevo León y Puebla.
+
+Para resolver este problema aprovechamos el mismo vector de datos del problema anterior: datosNacionales.
+
+1.- Extraemos las columnas ENTIDAD_RES y TIPO_PACIENTE como se muestra a continuacion:
+
+```{r }
+header2<-c("ENTIDAD_RES","TIPO_PACIENTE")
+
+AuxiliarHospitalizados<-subset(datosNacionales, select =header2) 
+```
+
+En este codigo estamos extrayendo las datos con las columnas ENTIDAD_RES y TIPO_PACIENTE y lo estamos guardando en un vector llamado AuxiliarHospitalizados.
+
+posteriormente procedemos a revisar en el diccionario de datos y catalogo de datos las claves de los estados que se solicitan en el problema, siendo el resultado el siguiente:
+
+ 8 para chihuahua
+19 para nuevo leon
+21 para puebla 
+26 para sonora
+
+En el caso de la columna tipo de paciente obtenemos lo siguiente:
+
+1 Ambulatorio
+2 Hospitalizado
+99 No Especificado.
+
+Con este conocimiento procedemos a obtener las personas hospitalizadas en las entidades solicitadas de la siguiente manera:
+
+```{r }
+hospitalizadosPorEntidades<-subset(AuxiliarHospitalizados, (ENTIDAD_RES == 8 | ENTIDAD_RES==19 | ENTIDAD_RES==21 | ENTIDAD_RES==26) & TIPO_PACIENTE == 2)
+```
+
+Y por ultimo procedemos a exportar los datos con el nombre tabla2.csv con la siguiente instruccion:
+
+```{r }
+write.csv(hospitalizadosPorEntidades,"Tabla2.csv")
+```
+
