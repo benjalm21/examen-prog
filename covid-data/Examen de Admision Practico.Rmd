@@ -7,7 +7,12 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+```{r setup, include=FALSE}
 
+library(ggplot2)
+library(dplyr)
+library(dplyr)
+```
 ## Problema 1
 
 Generar una tabla con 3 columnas: Fecha Confirmados de SARS-CoV2 en
@@ -16,24 +21,24 @@ Decesos (entre los confirmados) por fecha.
 
 Para resolver este problema se utiliza el archivo
 200511COVID19MEXICO.csv indicado en el ejercicio, el cual contiene la
-informacion de los casos de covid en mexico hasta esa fecha, de igual
+información de los casos de covid en mexico hasta esa fecha, de igual
 manera se hace uso de los archivos Catalogos_0412.xlsx y el archivo
 Descriptores_0419.xlsx para dale una interpretacion a los datos.
 
-En esta ocacion hare uso de R con RStudio para resolver el problema.
+En esta ocasión hare uso de R con RStudio para resolver el problema.
 
 Pasos a seguir para la solucion del problema:
 
 1.- importamos los datos en R, extrayendolos del archivo CSV
-"200511COVID19MEXICO.csv" ejecutando la siguiente linea de codigo;
+"200511COVID19MEXICO.csv" ejecutando la siguiente línea de código;
 
 ```{r cars}
 datosNacionales<-read.csv("200511covid19mexico.csv",header=T ,sep=",")
 ```
 
-datosNacionales es el vector en el que guardare la informacion extraida
+datosNacionales es el vector en el que guardare la información extraída
 del CSV. utilizamos la funcion read.csv indicando el nombre del archivo.
-el parametro header para indicar que la primera linea son los nombres de
+el parámetro header para indicar que la primera línea son los nombres de
 las columnas sep para indicar que el separador de los datos es la ",".
 
 2.- Posteriormente creamos un conjunto de datos con los nombres de las
@@ -50,15 +55,15 @@ datos nacionales
 AuxiliarDatosNacionales<-subset(datosNacionales,select = header)
 ```
 
-AuxiliarDatosNacionales almacenara la informacion extraida de
+AuxiliarDatosNacionales almacenara la información extraída de
 datosNacionales con las columnas expecificadas en el conjunto header.
 
-Una vez hecho esto procedemos a extraer la informacion que nos pide el
-problema, pero primero tenemos que revisar el diccionario y catalogo de
+Una vez hecho esto procedemos a extraer la información que nos pide el
+problema, pero primero tenemos que revisar el diccionario y catálogo de
 la base de datos
 
 Se nos pide la fecha de inicio de sintomas que esta representada por la
-columna "FECHA_SINTOMAS" la cual Idenitifica la fecha en que inició la
+columna "FECHA_SINTOMAS" la cual Identifica la fecha en que inició la
 sintomatología del paciente.
 
 Para los casos confirmado hacemos uso de la columna RESULTADO la cual
@@ -68,19 +73,22 @@ pendiente respectivamente.
 Para identificar el estado de sonora encontramos que el codigo asignado
 para esta es el 26.
 
-4.- por ultimo para las fechas de defuncion a menos que sea una fecha
+4.- por último para las fechas de defunción a menos que sea una fecha
 valida podemos interpretar que no ha habido deceso.
 
 ```{r }
 SonoraFallecidos<- subset(AuxiliarDatosNacionales,ENTIDAD_RES == 26 & RESULTADO == 1 & FECHA_DEF != "9999-99-99")
 ```
 
-
-5.- Por ultimo exportamos la informacion al archivo Tabla1.CSV son la
-siguiente instruccion:
+Eliminamos la columna entidad con la siguiente instrucción:
+```{r }
+SonoraFallecidos2<-subset(SonoraFallecidos,select =c("FECHA_SINTOMAS","FECHA_DEF","RESULTADO"))
+```
+5.- Por ultimo exportamos la información al archivo Tabla1.CSV son la
+siguiente instrucción:
 
 ```{r }
-write.csv(SonoraFallecidos,"Tabla1.csv")
+write.csv(SonoraFallecidos2,"Tabla1.csv")
 ```
 
 
@@ -126,3 +134,59 @@ Y por ultimo procedemos a exportar los datos con el nombre tabla2.csv con la sig
 write.csv(hospitalizadosPorEntidades,"Tabla2.csv")
 ```
 
+## Problema 3
+
+Realizar dos gráficas y guardarlas en el repositorio como grafica1.png y grafica2.png, las cuales contengan lo siguiente:
+En grafica1 realizar una gráfica de barras verticales con el número de casos hospitalizados (de acuerdo a nuestro archivo) de los estados de Sonora, Chihuahua, Nuevo León y Puebla.
+En grafica2 graficar la serie de tiempo de confirmados a nivel Nacional en el tiempo.
+
+Para realizar la primera grafica solicitada procedemos a utilizar el vector hospitalizadosPorEntidades, con la funciona Table agrupamos los datos por entidad y total de casos:
+
+
+```{r }
+hospitalizadosPorEntidadesGrafica<- table(hospitalizadosPorEntidades$ENTIDAD_RES)
+```
+Creamos un conjunto para las etiquetas de la grafica con los nombres de los estados ya que solo tenemos referencias numericas de ellos:
+
+```{r }
+letras<-c("Chihuahua","Nuevo Leon","Puebla","Sonora")
+```
+
+
+Creamos un frame para  graficar los datos en ggplot:
+```{r }
+DatosAgrupadosEntidad<- data.frame(hospitalizadosPorEntidadesGrafica)
+```
+
+procedemos a realizar el grafico con la siguiente instruccion:
+```{r }
+ggplot(xD,aes(x=letras ,y=Freq))+ geom_col()+ labs(title = "Pacientes por entidad",x="Entidad",y="Total")
+```
+Para la creacion de la grafica 2 extraemos 2 columnas de datosNacionales que son "FECHA_SINTOMAS" y "RESULTADO" con la siguiente instruccion:
+```{r }
+Nacional <- subset(datosNacionales, select = c("FECHA_SINTOMAS", "RESULTADO"))
+```
+
+Procedemos a extraer los datos positivos con la siguiente instruccion:
+```{r }
+NacionalReducida <- subset(Nacional, RESULTADO == 1)
+```
+
+Convertimos en fecha la columna de FECHA_SINTOMAS con la siguiente instruccion:
+```{r }
+NacionalReducida$FECHA_SINTOMAS <- as.Date(BD_nacional$FECHA_SINTOMAS)
+```
+
+Ahora procederemos a agrupar los datos por fecha y total de dias con la siguiente instruccion utilizando dplyr
+
+```{r }
+TotalPorDia<-NacionalReducida%>%
+  select(FECHA_SINTOMAS,RESULTADO)%>%
+  group_by(FECHA_SINTOMAS)%>%
+ summarise(Total=sum(RESULTADO))
+```
+
+con esto procedemos a graficar el resultado con la siguiente instruccion:
+```{r }
+ggplot(TotalPorDia, aes(x=FECHA_SINTOMAS,y=Total))+ geom_line(colour="Blue")+labs(title = "Casos Sobre Tiempo",x="Fecha")
+```
