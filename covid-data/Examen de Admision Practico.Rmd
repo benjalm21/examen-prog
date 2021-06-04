@@ -1,0 +1,83 @@
+---
+title: "Examen de Admision Practico"
+author: "Benjamin Lopez"
+date: "6/4/2021"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Problema 1
+
+Generar una tabla con 3 columnas: Fecha Confirmados de SARS-CoV2 en
+Sonora por fecha usando la fecha de inicio de síntomas (no acumulados)
+Decesos (entre los confirmados) por fecha.
+
+Para resolver este problema se utiliza el archivo
+200511COVID19MEXICO.csv indicado en el ejercicio, el cual contiene la
+informacion de los casos de covid en mexico hasta esa fecha, de igual
+manera se hace uso de los archivos Catalogos_0412.xlsx y el archivo
+Descriptores_0419.xlsx para dale una interpretacion a los datos.
+
+En esta ocacion hare uso de R con RStudio para resolver el problema.
+
+Pasos a seguir para la solucion del problema:
+
+1.- importamos los datos en R, extrayendolos del archivo CSV
+"200511COVID19MEXICO.csv" ejecutando la siguiente linea de codigo;
+
+```{r cars}
+datosNacionales<-read.csv("200511covid19mexico.csv",header=T ,sep=",")
+```
+
+datosNacionales es el vector en el que guardare la informacion extraida
+del CSV. utilizamos la funcion read.csv indicando el nombre del archivo.
+el parametro header para indicar que la primera linea son los nombres de
+las columnas sep para indicar que el separador de los datos es la ",".
+
+2.- Posteriormente creamos un conjunto de datos con los nombres de las
+columnas que nos interesa extraer del vector:
+
+```{r }
+header<- c("FECHA_SINTOMAS","FECHA_DEF","RESULTADO","ENTIDAD_RES")
+```
+
+3-. ahora procedemos a extrear las columnas que necesitamos del vector
+datos nacionales
+
+```{r }
+AuxiliarDatosNacionales<-subset(datosNacionales,select = header)
+```
+
+AuxiliarDatosNacionales almacenara la informacion extraida de
+datosNacionales con las columnas expecificadas en el conjunto header.
+
+Una vez hecho esto procedemos a extraer la informacion que nos pide el
+problema, pero primero tenemos que revisar el diccionario y catalogo de
+la base de datos
+
+Se nos pide la fecha de inicio de sintomas que esta representada por la
+columna "FECHA_SINTOMAS" la cual Idenitifica la fecha en que inició la
+sintomatología del paciente.
+
+Para los casos confirmado hacemos uso de la columna RESULTADO la cual
+puede albergar 3 claves: 1,2,3 que significan Positivo,No Positivo y
+pendiente respectivamente.
+
+Para identificar el estado de sonora encontramos que el codigo asignado
+para esta es el 26.
+
+4.- por ultimo para las fechas de defuncion a menos que sea una fecha
+valida podemos interpretar que no ha habido deceso.
+
+```{r }
+SonoraFallecidos<- subset(AuxiliarDatosNacionales,ENTIDAD_RES == 26 & RESULTADO == 1 & FECHA_DEF != "9999-99-99")
+```
+
+5.- Por ultimo exportamos la informacion al archivo Tabla1.CSV son la
+siguiente instruccion:
+
+```{r }
+write.csv(SonoraFallecidos,"Tabla1.csv")
+```
