@@ -7,12 +7,14 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+
 ```{r setup, include=FALSE}
 
 library(ggplot2)
 library(dplyr)
-library(dplyr)
+
 ```
+
 ## Problema 1
 
 Generar una tabla con 3 columnas: Fecha Confirmados de SARS-CoV2 en
@@ -81,9 +83,11 @@ SonoraFallecidos<- subset(AuxiliarDatosNacionales,ENTIDAD_RES == 26 & RESULTADO 
 ```
 
 Eliminamos la columna entidad con la siguiente instrucción:
+
 ```{r }
 SonoraFallecidos2<-subset(SonoraFallecidos,select =c("FECHA_SINTOMAS","FECHA_DEF","RESULTADO"))
 ```
+
 5.- Por ultimo exportamos la información al archivo Tabla1.CSV son la
 siguiente instrucción:
 
@@ -91,15 +95,16 @@ siguiente instrucción:
 write.csv(SonoraFallecidos2,"Tabla1.csv")
 ```
 
-
 ## Problema 2
 
+Generar una tabla con la cantidad de casos hospitalizados en los estados
+de Sonora, Chihuahua, Nuevo León y Puebla.
 
-Generar una tabla con la cantidad de casos hospitalizados en los estados de Sonora, Chihuahua, Nuevo León y Puebla.
+Para resolver este problema aprovechamos el mismo vector de datos del
+problema anterior: datosNacionales.
 
-Para resolver este problema aprovechamos el mismo vector de datos del problema anterior: datosNacionales.
-
-1.- Extraemos las columnas ENTIDAD_RES y TIPO_PACIENTE como se muestra a continuacion:
+1.- Extraemos las columnas ENTIDAD_RES y TIPO_PACIENTE como se muestra a
+continuacion:
 
 ```{r }
 header2<-c("ENTIDAD_RES","TIPO_PACIENTE")
@@ -107,28 +112,29 @@ header2<-c("ENTIDAD_RES","TIPO_PACIENTE")
 AuxiliarHospitalizados<-subset(datosNacionales, select =header2) 
 ```
 
-En este codigo estamos extrayendo las datos con las columnas ENTIDAD_RES y TIPO_PACIENTE y lo estamos guardando en un vector llamado AuxiliarHospitalizados.
+En este codigo estamos extrayendo las datos con las columnas ENTIDAD_RES
+y TIPO_PACIENTE y lo estamos guardando en un vector llamado
+AuxiliarHospitalizados.
 
-posteriormente procedemos a revisar en el diccionario de datos y catalogo de datos las claves de los estados que se solicitan en el problema, siendo el resultado el siguiente:
+posteriormente procedemos a revisar en el diccionario de datos y
+catalogo de datos las claves de los estados que se solicitan en el
+problema, siendo el resultado el siguiente:
 
- 8 para chihuahua
-19 para nuevo leon
-21 para puebla 
-26 para sonora
+8 para chihuahua 19 para nuevo leon 21 para puebla 26 para sonora
 
 En el caso de la columna tipo de paciente obtenemos lo siguiente:
 
-1 Ambulatorio
-2 Hospitalizado
-99 No Especificado.
+1 Ambulatorio 2 Hospitalizado 99 No Especificado.
 
-Con este conocimiento procedemos a obtener las personas hospitalizadas en las entidades solicitadas de la siguiente manera:
+Con este conocimiento procedemos a obtener las personas hospitalizadas
+en las entidades solicitadas de la siguiente manera:
 
 ```{r }
 hospitalizadosPorEntidades<-subset(AuxiliarHospitalizados, (ENTIDAD_RES == 8 | ENTIDAD_RES==19 | ENTIDAD_RES==21 | ENTIDAD_RES==26) & TIPO_PACIENTE == 2)
 ```
 
-Y por ultimo procedemos a exportar los datos con el nombre tabla2.csv con la siguiente instruccion:
+Y por ultimo procedemos a exportar los datos con el nombre tabla2.csv
+con la siguiente instruccion:
 
 ```{r }
 write.csv(hospitalizadosPorEntidades,"Tabla2.csv")
@@ -136,48 +142,62 @@ write.csv(hospitalizadosPorEntidades,"Tabla2.csv")
 
 ## Problema 3
 
-Realizar dos gráficas y guardarlas en el repositorio como grafica1.png y grafica2.png, las cuales contengan lo siguiente:
-En grafica1 realizar una gráfica de barras verticales con el número de casos hospitalizados (de acuerdo a nuestro archivo) de los estados de Sonora, Chihuahua, Nuevo León y Puebla.
-En grafica2 graficar la serie de tiempo de confirmados a nivel Nacional en el tiempo.
+Realizar dos gráficas y guardarlas en el repositorio como grafica1.png y
+grafica2.png, las cuales contengan lo siguiente: En grafica1 realizar
+una gráfica de barras verticales con el número de casos hospitalizados
+(de acuerdo a nuestro archivo) de los estados de Sonora, Chihuahua,
+Nuevo León y Puebla. En grafica2 graficar la serie de tiempo de
+confirmados a nivel Nacional en el tiempo.
 
-Para realizar la primera grafica solicitada procedemos a utilizar el vector hospitalizadosPorEntidades, con la funciona Table agrupamos los datos por entidad y total de casos:
-
+Para realizar la primera grafica solicitada procedemos a utilizar el
+vector hospitalizadosPorEntidades, con la funciona Table agrupamos los
+datos por entidad y total de casos:
 
 ```{r }
 hospitalizadosPorEntidadesGrafica<- table(hospitalizadosPorEntidades$ENTIDAD_RES)
 ```
-Creamos un conjunto para las etiquetas de la grafica con los nombres de los estados ya que solo tenemos referencias numericas de ellos:
+
+Creamos un conjunto para las etiquetas de la grafica con los nombres de
+los estados ya que solo tenemos referencias numericas de ellos:
 
 ```{r }
 letras<-c("Chihuahua","Nuevo Leon","Puebla","Sonora")
 ```
 
+Creamos un frame para graficar los datos en ggplot:
 
-Creamos un frame para  graficar los datos en ggplot:
 ```{r }
 DatosAgrupadosEntidad<- data.frame(hospitalizadosPorEntidadesGrafica)
 ```
 
 procedemos a realizar el grafico con la siguiente instruccion:
+
 ```{r }
-ggplot(xD,aes(x=letras ,y=Freq))+ geom_col()+ labs(title = "Pacientes por entidad",x="Entidad",y="Total")
+ggplot(DatosAgrupadosEntidad,aes(x=letras ,y=Freq))+ geom_col()+ labs(title = "Pacientes por entidad",x="Entidad",y="Total")
 ```
-Para la creacion de la grafica 2 extraemos 2 columnas de datosNacionales que son "FECHA_SINTOMAS" y "RESULTADO" con la siguiente instruccion:
+
+Para la creacion de la grafica 2 extraemos 2 columnas de datosNacionales
+que son "FECHA_SINTOMAS" y "RESULTADO" con la siguiente instruccion:
+
 ```{r }
 Nacional <- subset(datosNacionales, select = c("FECHA_SINTOMAS", "RESULTADO"))
 ```
 
 Procedemos a extraer los datos positivos con la siguiente instruccion:
+
 ```{r }
 NacionalReducida <- subset(Nacional, RESULTADO == 1)
 ```
 
-Convertimos en fecha la columna de FECHA_SINTOMAS con la siguiente instruccion:
+Convertimos en fecha la columna de FECHA_SINTOMAS con la siguiente
+instruccion:
+
 ```{r }
-NacionalReducida$FECHA_SINTOMAS <- as.Date(BD_nacional$FECHA_SINTOMAS)
+NacionalReducida$FECHA_SINTOMAS <- as.Date(NacionalReducida$FECHA_SINTOMAS)
 ```
 
-Ahora procederemos a agrupar los datos por fecha y total de dias con la siguiente instruccion utilizando dplyr
+Ahora procederemos a agrupar los datos por fecha y total de dias con la
+siguiente instruccion utilizando dplyr
 
 ```{r }
 TotalPorDia<-NacionalReducida%>%
@@ -186,7 +206,9 @@ TotalPorDia<-NacionalReducida%>%
  summarise(Total=sum(RESULTADO))
 ```
 
-con esto procedemos a graficar el resultado con la siguiente instruccion:
+con esto procedemos a graficar el resultado con la siguiente
+instruccion:
+
 ```{r }
 ggplot(TotalPorDia, aes(x=FECHA_SINTOMAS,y=Total))+ geom_line(colour="Blue")+labs(title = "Casos Sobre Tiempo",x="Fecha")
 ```
